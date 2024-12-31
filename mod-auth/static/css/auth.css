@@ -1,0 +1,46 @@
+/* Auth CSS: styling for auth module - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+@import '/css/base.css';
+
+body {
+    background-color: #f8f8f8;
+    font-size: 1rem;
+}
+
+main {
+    padding-left: 0;
+
+    & div {
+        margin: 4rem auto; max-width: 20rem;
+    }
+}
+
+form {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    width: auto;
+
+    & input {
+        padding: 0.2em;
+    }
+
+    & button[type=submit] {
+        margin-left: 0;
+        padding: 0.2em;
+    }
+
+    & li.link, li.link a { /* forgot password / register now */
+        font-size: 0.9rem;
+        color: #999999;
+    }
+
+    & span.fa-eye, span.fa-eye-slash { /* reveal password */
+        opacity: 50%; cursor:
+        pointer; margin-left: -2em;
+    }
+}
+
+footer {
+    background-color: #ffffff;
+}

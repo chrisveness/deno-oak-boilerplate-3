@@ -1,0 +1,8 @@
+/* Admin CSS: styling for admin module - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+@import '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css';
+@import '/css/base.css';
+@import '/css/nav.css';
+
+a, a:visited { color: #660000; }
+a.grey       { color: #999999; }

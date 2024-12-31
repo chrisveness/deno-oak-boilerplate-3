@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Add member</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+
+{{>navpartial}}
+
+<main>
+
+    <h1>Add member</h1>
+
+    {{>errpartial}}
+
+    <form method="post">
+        <fieldset><legend>Member</legend>
+            <ul>
+                <li>
+                    <label for="firstname">First name</label>
+                    <input name="firstname" id="firstname" value="{{Firstname}}" class="w16" autofocus>
+                </li>
+                <li>
+                    <label for="lastname">Last name</label>
+                    <input name="lastname" id="lastname" value="{{Lastname}}" class="w16">
+                </li>
+                <li>
+                    <label for="email">E-mail</label>
+                    <input name="email" id="email" type="email" value="{{Email}}" class="w16" required>
+                </li>
+                <li>
+                    <label for="Active">Active</label>
+                    <input name="Active" id="Active" type="checkbox" {{#if Active}}checked{{/if}}>
+                </li>
+                <li>
+                    <label></label>
+                    <button type="submit" title="Add">Add</button>
+                </li>
+            </ul>
+        </fieldset>
+    </form>
+
+</main>
+
+</body>
+</html>

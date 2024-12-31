@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Edit team</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+    <style>
+        table button { background: none; border: none; padding: 0; cursor: pointer; } /* consistent with links */
+    </style>
+    <script type="module" src="/admin/js/members-teams-edit.js"></script>
+</head>
+<body>
+
+{{>navpartial}}
+
+<main>
+
+    <h1>Edit team</h1>
+
+    {{>errpartial}}
+
+    <form method="post">
+        <fieldset><legend>Team</legend>
+            <ul>
+                <li>
+                    <label for="name">Name</label>
+                    <input name="name" id="name" value="{{Name}}" required {{$guestDisable}} class="w16" autofocus>
+                </li>
+                <li class="{{$guestHide}}">
+                    <label></label>
+                    <button type="submit" title="Update">Update</button>
+                </li>
+            </ul>
+        </fieldset>
+    </form>
+
+    <h2>Members</h2>
+
+    <table>
+        <tr>
+            <td>
+                <select name="add-membership" required class="add-membership hide">
+                    <option></option>
+                    {{#notTeamMembers}}
+                    <option value="{{../TeamId}}:{{MemberId}}">{{Firstname}} {{Lastname}}</option>
+                    {{/notTeamMembers}}
+                </select>
+            </td>
+            <td><button type="button" class="add-membership fa fa-plus small grey {{$guestHide}}" title="add membership"></button></td>
+        </tr>
+        {{#teamMembers}}
+        <tr id="{{TeamId}}">
+            <td>{{Firstname}} {{Lastname}}</td>
+            <td><button type="button" id="{{TeamId}}:{{MemberId}}" class="delete-membership fa fa-trash-o small grey {{../$guestHide}}" title="remove {{Firstname}} {{Lastname}} from team"></button></td>
+        </tr>
+        {{/teamMembers}}
+    </table>
+
+</main>
+
+</body>
+</html>

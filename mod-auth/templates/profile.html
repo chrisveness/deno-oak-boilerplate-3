@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Profile</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/nav.css">
+    <style>
+        span.username-inuse { color: #990000; font-weight: bold; }
+    </style>
+    <script type="module" src="/js/form.js"></script>
+    <script type="module" src="/js/register.js"></script>
+</head>
+<body>
+
+{{>navpartial}}
+
+<main>
+
+<h1>Profile</h1>
+
+{{>errpartial}}
+
+<form method="post">
+    <ul>
+        <li>
+            <label for="firstname">First name</label>
+            <input name="firstname" id="firstname" value="{{Firstname}}" required  class="w12" autofocus>
+        </li>
+        <li>
+            <label for="lastname">Last name</label>
+            <input name="lastname" id="lastname" value="{{Lastname}}" required class="w12">
+        </li>
+        <li>
+            <label for="username">E-mail</label>
+            <input name="email" id="username" type="username" value="{{Email}}" required class="w16"> <span class="username-inuse"></span>
+        </li>
+        <li>
+            <label>Role</label>{{Role}}
+        </li>
+        <li>
+            <label></label>
+            <button type="submit">Update</button>
+            <input type="hidden" name="id" value="{{UserId}}">
+        </li>
+    </ul>
+</form>
+
+</main>
+
+</body>
+</html>

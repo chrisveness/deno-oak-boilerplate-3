@@ -1,0 +1,41 @@
+/* CSS styles for navigation menu  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+@import './dropdown-menu.css';
+
+main {
+    margin-top: 4rem; /* space for nav menu */
+}
+
+/* basic horizontal nav menu (no dropdowns) */
+nav {
+    position: fixed;
+    top: 0;
+    height: calc(3rem - 1px); /* remove scroll bar !! */
+    width: 100%;
+    font-size: 1rem;
+    color: #666666;
+    background: #f9f9f9;
+    border-bottom: 1px solid #cccccc;
+    min-width: 48em;   /* sufficient width for nav li.user to float to right of menu items */
+
+    & a {
+        color: #666666;
+        & img {
+            height: 24px;
+        }
+    }
+
+    & ul {
+        display: inline-block;
+        list-style: none;
+        padding: 0;
+        margin: 0.8em 0 0.2em 0;
+        width: calc(100% - 60px);
+        & li {
+            display: inline-block;
+            padding: 0.5em 1em;
+        }
+    }
+}
+
+@media print { nav { display: none; } } /* no need for nav on printouts */

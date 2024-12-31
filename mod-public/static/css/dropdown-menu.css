@@ -1,0 +1,60 @@
+/* CSS styles for drop-down menus  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+/* css-tricks.com/solved-with-css-dropdown-menus */
+
+
+nav ul li {
+    position: relative;
+
+    &.user {
+        float: right; /* user/profile menu sits to right */
+
+        &:hover:before { /* for username */
+            /* display: inline-block; */
+        }
+    }
+
+    & ul {
+        position: absolute;
+        display: none;
+        visibility: hidden;
+        opacity: 0;
+        left: 0;
+        margin: 0 0 0 1rem; /* override nav ul */
+        border-left: 1px solid #f0f0f0;
+        border-bottom: 1px solid #f0f0f0;
+        background-color: #ffffff;
+        width: 16em; /* excess goes off page, to varying degree according to length of username */
+    }
+}
+
+/* nav li:hover,
+nav li:focus-within {
+    cursor: pointer;
+} */
+
+nav ul li:focus-within a {
+    outline: none;
+}
+
+
+nav ul li:hover > ul,
+nav ul li:focus-within > ul,
+nav ul li ul:hover,
+nav ul li ul:focus {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+
+nav ul li ul li {
+    width: 100%; /* bg:hover fills whole li */
+}
+nav ul li ul li:hover {
+    background-color: #f9f9f9;
+}
+
+/* tweak appearance of user icon */
+nav ul li.user a img { width: 1.2rem; }
+nav ul li.user a img.cog { width: 1.3rem; margin-right: -1.24em; }
+nav ul li.user a span { display: inline-block; transform: translateY(-0.2rem); color: #999999; }

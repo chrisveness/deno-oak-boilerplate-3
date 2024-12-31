@@ -1,0 +1,17 @@
+{{#if $auth}}
+<nav>
+    <style> nav > ul > li.user:hover:before { content: '{{$auth.user.username}}' } </style>
+    <ul>
+        <li><a href="/admin">/</a></li>
+        <li><a href="/admin/members">Members</a></li>
+        <li><a href="/admin/teams">Teams</a></li>
+        <li class="user">
+            <a style="margin-left: 0.4rem"><img src="/img/user-icon.svg" alt="head"><span>▼</span></a>
+            <ul class="dropdown">
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/sign-out">Sign out</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+{{/if}}

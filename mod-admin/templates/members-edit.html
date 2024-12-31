@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Edit member</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+    <style>
+        table button { background: none; border: none; padding: 0; cursor: pointer; } /* consistent with links */
+    </style>
+    <script type="module" src="/admin/js/members-teams-edit.js"></script>
+</head>
+<body>
+
+{{>navpartial}}
+
+<main>
+
+    <h1>Edit member</h1>
+
+    {{>errpartial}}
+
+    <form method="post">
+        <fieldset><legend>Member</legend>
+            <ul>
+                <li>
+                    <label for="firstname">First name</label>
+                    <input name="firstname" id="firstname" value="{{Firstname}}" required {{$guestDisable}} class="w16" autofocus>
+                </li>
+                <li>
+                    <label for="lastname">Last name</label>
+                    <input name="lastname" id="lastname" value="{{Lastname}}" required {{$guestDisable}} class="w16">
+                </li>
+                <li>
+                    <label for="email">E-mail</label>
+                    <input name="email" id="email" type="email" value="{{Email}}" required {{$guestDisable}} class="w16" required>
+                </li>
+                <li>
+                    <label for="active">Active</label>
+                    <input name="active" id="active" type="checkbox" {{$guestDisable}} {{#if Active}}checked{{/if}}>
+                </li>
+                <li class="{{$guestHide}}">
+                    <label></label>
+                    <button type="submit" title="Update">Update</button>
+                </li>
+            </ul>
+        </fieldset>
+    </form>
+
+    <h2>Teams</h2>
+
+    <table>
+        <tr>
+            <td>
+                <select name="add-membership" required class="add-membership hide">
+                    <option></option>
+                    {{#notMemberOfTeams}}
+                    <option value="{{TeamId}}:{{../MemberId}}">{{Name}}</option>
+                    {{/notMemberOfTeams}}
+                </select>
+            </td>
+            <td><button type="button" class="add-membership fa fa-plus small grey {{$guestHide}}" title="add membership"></button></td>
+        </tr>
+        {{#memberOfTeams}}
+        <tr id="{{TeamId}}">
+            <td>{{Name}}</td>
+            <td><button type="button" id="{{TeamId}}:{{MemberId}}" class="delete-membership fa fa-trash-o small grey {{../$guestHide}}" title="delete {{Name}} membership"></button></td>
+        </tr>
+        {{/memberOfTeams}}
+    </table>
+
+</main>
+
+</body>
+</html>

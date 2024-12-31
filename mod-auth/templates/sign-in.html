@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Sign In</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/auth/css/auth.css">
+    <link rel="stylesheet" href="/css/nav.css">
+    <style> ul.logins { font-size: 0.75em; } p.logins { font-size: 0.9em; } </style>
+    <script type="module" src="/auth/js/show-pw.js"></script>
+</head>
+<body>
+
+{{>navpartial}}
+
+<main>
+    <div>
+
+        <h1>Sign In</h1>
+
+        {{>errpartial}}
+
+        <form method="post">
+            <ul>
+                <li>
+                    <label for="username">E-mail</label>
+                    <input name="username" id="username" type="email" value="{{$flash.form.username}}" required autofocus class="w12">
+                </li>
+                <li>
+                    <label for="password">Password</label>
+                    <input name="password" id="password" type="password" required class="w12">
+                    <span id="show-pw" title="show password" class="fa fa-eye"></span>
+                </li>
+                <li>
+                    <label></label>
+                    <button type="submit" class="w12">Sign In</button>
+                    {{#if $flash.failmsg}}<span class="error-msg">{{$flash.failmsg}}</span>{{/if}}
+                </li>
+                <li class="link">
+                    <label></label>
+                    <a href="/password/reset-request">Forgot password?</a>
+                </li>
+                <li class="link">
+                    Don’t have an account? <a href="/register">Register now</a>
+                </li>
+            </ul>
+        </form>
+
+        <p class="logins">Test logins:</p>
+        <ul class="logins">
+            <li><i>guest@user.com / guest</i> for read-only access</li>
+            <li><i>admin@user.com / admin</i> for full access</li>
+        </ul>
+
+    </div>
+</main>
+
+</body>
+</html>

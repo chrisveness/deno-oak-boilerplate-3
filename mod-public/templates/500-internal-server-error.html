@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Oops!</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/public.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+<body>
+
+{{>navpartial}}
+
+<main>
+
+    <h1>Oops!</h1>
+
+    <p class="red"><b>Something went wrong :(</b></p>
+
+    <p>Please contact the website administrator.</p>
+
+    <pre class="small grey">{{err.stack}}</pre>
+
+</main>
+
+</body>
+</html>

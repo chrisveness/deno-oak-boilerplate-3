@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Teams</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+    <style>
+        table button { border: none; background: none; padding: 0; cursor: pointer; } /* consistent with links */
+    </style>
+    <script type="module" src="/admin/js/members-teams-list.js"></script>
+</head>
+<body>
+
+{{>navpartial}}
+
+<main>
+
+    <h1>Teams</h1>
+
+    {{#if $error}}
+    <p class=error>{{$error}}</p>
+    {{/if}}
+
+    <table>
+        <tr>
+            <td></td>
+            <td></td>
+            <td><a href="/admin/teams/add" class="fa fa-plus small grey {{$guestHide}}" title="add team"></a>
+        </tr>
+        {{#teams}}
+        <tr id="{{TeamId}}">
+            <td><a href="/admin/teams/{{TeamId}}">{{Name}}</a></td>
+            <td><a href="/admin/teams/{{TeamId}}" class="fa fa-pencil small grey {{../$guestHide}}" title="edit team"></a>
+            <td><button class="op-delete fa fa-trash-o small grey {{../$guestHide}}" title="delete {{Name}}"></a>
+        </tr>
+        {{/teams}}
+    </table>
+
+</main>
+
+</body>
+</html>
