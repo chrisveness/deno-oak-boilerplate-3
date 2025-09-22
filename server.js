@@ -48,19 +48,11 @@ app.use(async function setModule(ctx, next) {
 });
 
 
-// set request id for subsequent logging, to identify further processing of this request
-app.use(async function requestId(ctx, next) {
-    ctx.state.reqId = Math.random().toString(36).substring(2, 8);
-    await next();
-});
-
-
-// log each request (excluding static files)
-app.use(async function requestId(ctx, next) {
-    const staticFile = ctx.request.accepts('image/*', '*/*') == 'image/*'
-        || [ 'css', 'js' ].includes(ctx.request.url.pathname.split('.').at(-1));
-    const relUrl = ctx.request.url.pathname + ctx.request.url.search;
-    if (!staticFile) debug(`${ctx.state.module.padEnd(6)} ${ctx.state.reqId} ${ctx.request.method.padEnd(6)} ${relUrl}`);
+// add request id to context; note - to decode hex IP to dotted-decimal: ip.match(/.{2}/g).map(byte => parseInt(byte, 16)).join('.')
+app.use(async function responseTime(ctx, next) {
+    const ip16 = ctx.request.ip.replace('::ffff:', '').split(/[.:]/).map(byte => (+byte).toString(16).padStart(2, '0')).join('');
+    const ts36 = new Date().valueOf().toString(36).slice(-4); // last 4 digits gives 28 minutes resolution - longer than any reasonable request
+    ctx.state.reqId = `${ip16}:${ts36}`;
     await next();
 });
 
@@ -85,12 +77,14 @@ app.use(async function serveStaticPublic(ctx, next) {
 app.keys = [ 'deno-oak-boilerplate' ];
 
 
-// return request processing time in Server-Timing header
+// log each request (excluding static files) & return request processing time in Server-Timing header
 app.use(async function responseTime(ctx, next) {
-    performance.mark('proc>');
+    debug(`${ctx.state.module.padEnd(6)} ${ctx.state.reqId} ${ctx.request.method.padEnd(6)} ${ctx.request.url.pathname}${ctx.request.url.search}`);
+    const now = performance.now();
+
     await next();
-    performance.mark('proc<');
-    ctx.response.headers.set('Server-Timing', `proc;dur=${performance.measure('proc', 'proc>', 'proc<').duration.toFixed(2)}`);
+
+    ctx.response.headers.set('Server-Timing', `*;dur=${(performance.now() - now).toFixed(2)}`);
 });
 
 
@@ -187,25 +181,6 @@ app.use(async function verifyJwt(ctx, next) {
     await next();
 });
 
-
-// serve static files (img, css, js); allow browser to cache for 1 day (1 sec in dev)
-app.use(async function serveStatic(ctx, next) {
-    const [ , seg1, seg2 ] = ctx.request.url.pathname.split('/');
-    const serveStaticSecure = seg1 == ctx.state.module && [ 'img', 'css', 'js' ].includes(seg2);
-
-    // serve requested file if it exists within module's static/, otherwise continue
-    if (serveStaticSecure && ctx.state.auth) {
-        const opts = {
-            root:   `mod-${ctx.state.module}/static`,                          // module static directory
-            path:   ctx.request.url.pathname.slice(ctx.state.module.length+1), // path without module prefix
-            maxage: ctx.state.env == 'production' ? 1000*60*60*24 : 1000,      // 24H, or 1 sec in dev
-        };
-        await ctx.send(opts);
-    } else {
-        await next();
-    }
-});
-
 // /register/available depends on whether user signed in or not
 app.use(routesRegister);
 
@@ -226,6 +201,22 @@ app.use(async function verifySignedIn(ctx, next) {
 });
 
 // ... as subsequent modules require authentication
+
+// serve static files within secure modules (/<mod>/img/*, /<mod>/css/*, /<mod>/js/*)
+app.use(async function serveStaticSecure(ctx, next) {
+    // serve requested file if it exists within module's static/, otherwise continue
+    const staticFile = [ 'css', 'img', 'js' ].includes(ctx.request.url.pathname.split('/')[2]);
+    if (staticFile) {
+        const opts = {
+            root:   `mod-${ctx.state.module}/static`,                          // module static directory
+            path:   ctx.request.url.pathname.slice(ctx.state.module.length+1), // path without module prefix
+            maxage: ctx.state.env == 'production' ? 1000*60*60*24 : 1000,      // 24H, or 1 sec in dev
+        };
+        await ctx.send(opts);
+    } else {
+        await next();
+    }
+});
 
 // routes for admin module
 app.use(routesAdmin);
