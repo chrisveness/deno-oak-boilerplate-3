@@ -1,15 +1,14 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Deno/Oak boilerplate-3: Basic Sample App               © 2024 Chris Veness / Movable Type Ltd  */
+/* Deno/Oak boilerplate-3: Basic Sample App          © 2024-2025 Chris Veness / Movable Type Ltd  */
 /*                                                                                                */
 /* Fairly basic example SSR sample app boilerplace building on boilerplace-2, with a structure of */
-/* a laarger app broken into modules.                                                             */
+/* a larger app broken into modules.                                                              */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { Application } from '@oak/oak';
 import { Session }     from 'oak_sessions';
 import { Handlebars }  from '@danet/handlebars';
-import Debug           from 'debug';
-const debug = Debug('req');
+import Debug           from 'debug'; const debug = Debug('req');
 
 import JwtAuth from './lib/jwt-auth.js';
 
@@ -66,17 +65,13 @@ app.use(async function requestId(ctx, next) {
 });
 
 
-// serve static files (img, css, js); allow browser to cache for 1 day (1 sec in dev)
-app.use(async function serveStatic(ctx, next) {
-    // public static files are /img/*, /css/*, /js/*, or same prefixed by /auth
-    const [ , seg1, seg2 ] = ctx.request.url.pathname.split('/');
-    const serveStaticPublic = [ 'img', 'css', 'js' ].includes(seg1) || (seg1=='auth' && [ 'img', 'css', 'js' ].includes(seg2));
-
-    // serve requested file if it exists within mod-public/static/, otherwise continue
-    if (serveStaticPublic) {
+// serve static files (/img/*, /css/*, /js/*); allow browser to cache for 1 day (1 sec in dev)
+app.use(async function serveStaticPublic(ctx, next) {
+    // serve requested file if it exists within static/, otherwise continue
+    const staticFile = [ 'css', 'img', 'js' ].includes(ctx.request.url.pathname.split('/')[1]);
+    if (staticFile) {
         const opts = {
-            root:   seg1=='auth' ? 'mod-auth/static' : 'mod-public/static',
-            path:   ctx.request.url.pathname.replace(/^\/auth/, ''),
+            root:   'static',                                             // generic static directory
             maxage: ctx.state.env == 'production' ? 1000*60*60*24 : 1000, // 24H, or 1 sec in dev
         };
         try { await ctx.send(opts); } catch { ctx.response.status = 404; };

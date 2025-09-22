@@ -7,12 +7,12 @@ document.querySelector('#username').onchange = async function() {
     if (!response.ok) {
         this.setCustomValidity('e-mail already registered');
         this.style = 'box-shadow: 0 0 2px #ee0000';
-        document.querySelector('span.username-inuse').textContent = 'e-mail already registered';
+        document.querySelector('div.username-inuse').textContent = 'e-mail already registered';
         document.querySelector('button').disabled = true;
     } else {
         this.setCustomValidity('');
         this.style = 'box-shadow: revert';
-        document.querySelector('span.username-inuse').textContent = '';
+        document.querySelector('div.username-inuse').textContent = '';
         document.querySelector('button').disabled = false;
     }
 };

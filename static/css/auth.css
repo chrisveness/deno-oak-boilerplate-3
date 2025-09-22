@@ -11,7 +11,7 @@ main {
     padding-left: 0;
 
     & div {
-        margin: 4rem auto; max-width: 20rem;
+        margin: 4rem auto; max-width: 24rem;
     }
 }
 
