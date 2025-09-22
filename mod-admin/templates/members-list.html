@@ -27,14 +27,14 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><a href="/admin/members/add" class="fa fa-plus small grey {{$guestHide}}" title="add member"></a>
+            <td><a href="/admin/members/add" class="fa fa-plus small grey {{$hideIf.guest}}" title="add member"></a>
         </tr>
         {{#members}}
         <tr id="{{MemberId}}">
             <td><a href="/admin/members/{{MemberId}}">{{Firstname}}</a></td>
             <td><a href="/admin/members/{{MemberId}}">{{Lastname}}</a></td>
-            <td><a href="/admin/members/{{MemberId}}" class="fa fa-pencil small grey {{../$guestHide}}" title="edit {{Firstname}} {{Lastname}}"></a>
-            <td><button class="op-delete fa fa-trash-o small grey {{../$guestHide}}" title="delete {{Firstname}} {{Lastname}}"></a>
+            <td><a href="/admin/members/{{MemberId}}" class="fa fa-pencil small grey {{../$hideIf.guest}}" title="edit {{Firstname}} {{Lastname}}"></a></td>
+            <td><button class="op-delete fa fa-trash-o small grey {{../$hideIf.guest}}" title="delete {{Firstname}} {{Lastname}}"></button></td>
         </tr>
         {{/members}}
     </table>

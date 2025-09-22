@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Admin/Teams handlers                                           © 2016-2024 Chris Veness / MTL  */
+/* Admin/Teams handlers                                           © 2016-2025 Chris Veness / MTL  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Debug from 'debug';
@@ -32,7 +32,7 @@ class TeamsHandlers {
 
             const context = {
                 teams:      teams,
-                $guestHide: ctx.state.auth.user.role == 'guest' ? 'hide' : '',
+                $hideIf:    { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
                 $auth:      ctx.state.auth, // for nav menu
             };
             if (ctx.request.accepts('text/html', 'application/json') == 'application/json') return ctx.response.body = context; // for tests
@@ -48,7 +48,7 @@ class TeamsHandlers {
                 const context = {
                     teams:      teams,
                     $error:     err.message,
-                    $guestHide: ctx.state.auth.user.role == 'guest' ? 'hide' : '',
+                    $hideIf:    { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
                     $auth:      ctx.state.auth, // for nav menu
                 };
                 ctx.response.body = await ctx.state.handlebars.renderView('teams-list', context);
@@ -125,8 +125,8 @@ class TeamsHandlers {
             teamMembers:    teamMembers,
             notTeamMembers: notTeamMembers,
             $flash:         ctx.state.session.get('flash'),
-            $guestHide:     ctx.state.auth.user.role == 'guest' ? 'hide' : '',
-            $guestDisable:  ctx.state.auth.user.role == 'guest' ? 'disabled' : '',
+            $hideIf:        { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
+            $disableIf:     { guest: ctx.state.auth.user.role == 'guest' ? 'disable' : '' },
             $auth:          ctx.state.auth, // for nav menu
         };
         if (ctx.request.accepts('text/html', 'application/json') == 'application/json') return ctx.response.body = context; // for tests

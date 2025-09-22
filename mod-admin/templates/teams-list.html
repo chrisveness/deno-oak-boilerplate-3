@@ -26,13 +26,13 @@
         <tr>
             <td></td>
             <td></td>
-            <td><a href="/admin/teams/add" class="fa fa-plus small grey {{$guestHide}}" title="add team"></a>
+            <td><a href="/admin/teams/add" class="fa fa-plus small grey {{$hideIf.guest}}" title="add team"></a>
         </tr>
         {{#teams}}
         <tr id="{{TeamId}}">
             <td><a href="/admin/teams/{{TeamId}}">{{Name}}</a></td>
-            <td><a href="/admin/teams/{{TeamId}}" class="fa fa-pencil small grey {{../$guestHide}}" title="edit team"></a>
-            <td><button class="op-delete fa fa-trash-o small grey {{../$guestHide}}" title="delete {{Name}}"></a>
+            <td><a href="/admin/teams/{{TeamId}}" class="fa fa-pencil small grey {{../$hideIf.guest}}" title="edit team"></a>
+            <td><button class="op-delete fa fa-trash-o small grey {{../$hideIf.guest}}" title="delete {{Name}}"></a>
         </tr>
         {{/teams}}
     </table>
