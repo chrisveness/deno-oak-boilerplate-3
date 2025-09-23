@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Contact Us</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/nav.css">
+    <style>
+        body { max-width: 48em; }
+        pre { line-height: 1.2em; background-color: #eeeeee; padding: 0.4em; }
+    </style>
+</head>
+<body>
+
+{{>navpartial}}
+
+<main>
+    <h1>Contact Us</h1>
+
+    {{#if $flash}}
+
+    <p>Dear {{$flash.email}},</p>
+    <p>Thank you for your interest, but unfortunately this page does nothing but mirror back your message:</p>
+    <pre>{{$flash.message}}</pre>
+
+    {{else}}
+
+    <form method="post">
+        <fieldset><legend>Contact</legend>
+            <ul>
+                <li>
+                    <label for="email">E-mail</label>
+                    <input type="email" name="email" id="email" class="w16" required>
+                </li>
+                <li>
+                    <label for="message">Message</label>
+                    <textarea name="message" id="message" class="w16" required></textarea>
+                </li>
+                <li>
+                    <label></label>
+                    <button type="submit">Send</button>
+                </li>
+            </ul>
+        </fieldset>
+    </form>
+
+    {{/if}}
+
+</main>
+
+</body>
+</html>

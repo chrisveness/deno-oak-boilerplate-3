@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Public Handlers                                                     © 2024 Chris Veness / MTL  */
+/* Public Handlers                                                © 2024-2025 Chris Veness / MTL  */
 /*                                                                                                */
 /* The 'public' module handles any URLs not prefixed by specific module name - typically used for */
 /* wider range of unauthenticated pages with no specific prefix / subdomain.                      */
@@ -13,24 +13,10 @@ const debug = Debug('app');
 
 class Handlers {
 
-    // /**
-    //  * GET / - render index page.
-    //  */
-    // static async index(ctx) {
-    //     debug('index');
-    //     const context = {
-    //         time:   new Date().toISOString(),
-    //         envvar: Deno.env.get('MY_ENV_VAR'),
-    //     };
-    //     ctx.response.body = await ctx.state.handlebars.renderView('index', context);
-    // }
-
-
     /**
      * GET /readme - render README.md page
      */
-    static async readme(ctx) {
-        debug('readme');
+    static async getReadme(ctx) {
         const readmeMd = await Deno.readTextFile('./README.md');
         const readmeHtml = marked.parse(readmeMd);
         const readmeDom = new JsDom(readmeHtml).window.document;
@@ -38,6 +24,29 @@ class Handlers {
 
         const context = { title: h1, h1: h1, content: readmeHtml.replace(/<h1.+h1>/, '') };
         ctx.response.body = await ctx.state.handlebars.renderView('markdown', context);
+    }
+
+
+    /**
+     * GET /contact - render contact page.
+     */
+    static async getContact(ctx) {
+        const context = {
+            $flash: ctx.state.session.get('contact')
+        };
+        ctx.response.body = await ctx.state.handlebars.renderView('contact', context);
+    }
+
+    /**
+     * POST /contact - process contact page.
+     */
+    static async postContact(ctx) {
+        const form = Object.fromEntries((await ctx.request.body.form()));
+        debug(`POST   ${ctx.state.reqId} /contact`, form.email);
+
+        ctx.state.session.flash('contact', form); // display entered form values in contact page
+
+        ctx.response.redirect('/contact');
     }
 
 }
