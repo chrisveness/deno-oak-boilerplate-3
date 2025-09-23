@@ -79,7 +79,14 @@ app.keys = [ 'deno-oak-boilerplate' ];
 
 // log each request (excluding static files) & return request processing time in Server-Timing header
 app.use(async function responseTime(ctx, next) {
-    debug(`${ctx.state.module.padEnd(6)} ${ctx.state.reqId} ${ctx.request.method.padEnd(6)} ${ctx.request.url.pathname}${ctx.request.url.search}`);
+    const moduleStaticFile = [ 'css', 'img', 'js' ].includes(ctx.request.url.pathname.split('/')[2]);
+    if (!moduleStaticFile) {
+        // map text/html... => 'html', application/json => 'json', */* => '*', undefined => '-'
+        const acceptMedia = ctx.request.accepts()[0].startsWith('image') ? 'image' : ctx.request.accepts()[0].split(/[/,]/g)[1].padEnd(5) || '-    ';
+        const url = truncate(`${ctx.request.url.pathname}${ctx.request.url.search}`, 64);
+        debug(ctx.state.module.padEnd(6), ctx.state.reqId, ctx.request.method.padEnd(6), acceptMedia, url);
+    }
+
     const now = performance.now();
 
     await next();
@@ -119,7 +126,7 @@ app.use(async function handleErrors(ctx, next) {
         // error response, the 'accept' header should be set to 'application/json' (note a browser
         // request will include not just 'text/html' but also '*/*', so check preferred, not just
         // 'application/json')
-        const preferredMimeType = ctx.request.accepts(ctx.request, 'text/html', 'application/json');
+        const preferredMimeType = ctx.request.accepts('text/html', 'application/json');
         if (preferredMimeType == 'application/json') { // return a json object reporting the error
             ctx.response.body = { name: err.name, message: err.message };
         } else { // regular html page being served; render error page (or redirect to sign-in for 401)
@@ -233,3 +240,8 @@ app.addEventListener('listen', function() {
     console.info(`Deno/Oak Boilerplate-3 server listening on ${addr}:8080 @ ${new Date().toISOString().slice(0, 16).replace('T', ' ')}Z`);
 });
 app.listen({ port: 8080 });
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+/** limit s to l characters, appending ellipsis if truncated */
+function truncate(s, l) { return s?.length>l ? s.slice(0, l-1)+'…' : s; }
