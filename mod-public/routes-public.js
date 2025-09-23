@@ -2,6 +2,8 @@
 /* Public Routes                                                  © 2024-2025 Chris Veness / MTL  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
+/* eslint-disable space-in-parens */
+
 import { Router } from '@oak/oak';
 
 const router = new Router();

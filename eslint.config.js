@@ -38,6 +38,7 @@ export default [
             'space-before-blocks':     [ 'error', 'always' ],
             'space-in-parens':         [ 'error' ],
             'strict':                  [ 'error', 'global' ],
+            'jsdoc/no-defaults':       'off',
             'jsdoc/require-param':     'off',
             'jsdoc/require-returns':   'off',
             'jsdoc/tag-lines':         'off',

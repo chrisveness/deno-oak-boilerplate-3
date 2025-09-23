@@ -31,9 +31,9 @@ class TeamsHandlers {
             const teams = await db.prepare(sql).all(Object.fromEntries(qry.entries()));
 
             const context = {
-                teams:      teams,
-                $hideIf:    { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
-                $auth:      ctx.state.auth, // for nav menu
+                teams:   teams,
+                $hideIf: { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
+                $auth:   ctx.state.auth, // for nav menu
             };
             if (ctx.request.accepts('text/html', 'application/json') == 'application/json') return ctx.response.body = context; // for tests
             ctx.response.body = await ctx.state.handlebars.renderView('teams-list', context);
@@ -46,10 +46,10 @@ class TeamsHandlers {
                 const teams = await db.prepare(sql).all();
 
                 const context = {
-                    teams:      teams,
-                    $error:     err.message,
-                    $hideIf:    { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
-                    $auth:      ctx.state.auth, // for nav menu
+                    teams:   teams,
+                    $error:  err.message,
+                    $hideIf: { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
+                    $auth:   ctx.state.auth, // for nav menu
                 };
                 ctx.response.body = await ctx.state.handlebars.renderView('teams-list', context);
             } else {

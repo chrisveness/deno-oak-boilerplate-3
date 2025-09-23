@@ -32,7 +32,7 @@ class Handlers {
      */
     static async getContact(ctx) {
         const context = {
-            $flash: ctx.state.session.get('contact')
+            $flash: ctx.state.session.get('contact'),
         };
         ctx.response.body = await ctx.state.handlebars.renderView('contact', context);
     }
