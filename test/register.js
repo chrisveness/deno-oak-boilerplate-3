@@ -8,7 +8,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { assert, assertEquals } from '@std/assert';
-import { JSDOM as JsDom }       from 'jsdom'; // until DOMParser available in Deno
+import { DOMParser }            from 'linkedom';
 
 const origin = 'http://localhost:8080';
 
@@ -41,7 +41,7 @@ Deno.test('Register, password reset', async function(t) {
         assert(response.ok, response.status);
         assertEquals(response.headers.get('content-type'), 'text/html; charset=UTF-8');
         const html = await response.text();
-        const doc = new JsDom(html).window.document;
+        const doc = new DOMParser().parseFromString(html, 'text/html');
         const msg = doc.querySelector('form ul li').innerHTML;
         assert(msg.includes('Welcome to Deno Oak Boilerplate!')); // initial password set
         const email = doc.querySelector('form input#username').value;

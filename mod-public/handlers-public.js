@@ -5,9 +5,9 @@
 /* wider range of unauthenticated pages with no specific prefix / subdomain.                      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import { marked }         from 'marked';
-import { JSDOM as JsDom } from 'jsdom'; // until DOMParser available in Deno
-import Debug              from 'debug';
+import { marked }    from 'marked';
+import { DOMParser } from 'linkedom';
+import Debug         from 'debug';
 const debug = Debug('app');
 
 
@@ -19,7 +19,7 @@ class Handlers {
     static async getReadme(ctx) {
         const readmeMd = await Deno.readTextFile('./README.md');
         const readmeHtml = marked.parse(readmeMd);
-        const readmeDom = new JsDom(readmeHtml).window.document;
+        const readmeDom = new DOMParser().parseFromString(readmeHtml, 'text/html');
         const h1 = readmeDom.querySelector('h1')?.textContent;
 
         const context = { title: h1, h1: h1, content: readmeHtml.replace(/<h1.+h1>/, '') };
