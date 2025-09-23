@@ -21,19 +21,19 @@
             <ul>
                 <li>
                     <label for="firstname">First name</label>
-                    <input name="firstname" id="firstname" value="{{Firstname}}" class="w16" autofocus>
+                    <input name="firstname" id="firstname" value="{{$flash.form.firstname}}" class="w16" autofocus>
                 </li>
                 <li>
                     <label for="lastname">Last name</label>
-                    <input name="lastname" id="lastname" value="{{Lastname}}" class="w16">
+                    <input name="lastname" id="lastname" value="{{$flash.form.lastname}}" class="w16">
                 </li>
                 <li>
                     <label for="email">E-mail</label>
-                    <input name="email" id="email" type="email" value="{{Email}}" class="w16" required>
+                    <input name="email" id="email" type="email" value="{{$flash.form.email}}" class="w16" required>
                 </li>
                 <li>
                     <label for="Active">Active</label>
-                    <input name="Active" id="Active" type="checkbox" {{#if Active}}checked{{/if}}>
+                    <input name="active" id="active" type="checkbox" value="y" {{#if $flash.form.active}}checked{{/if}}>
                 </li>
                 <li>
                     <label></label>

@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Password Reset handlers                                © 2024 Chris Veness / Movable Type Ltd  */
+/* Password Reset handlers                           © 2024-2025 Chris Veness / Movable Type Ltd  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Scrypt         from 'scrypt-kdf';
@@ -32,7 +32,7 @@ class PasswordResetHandlers {
     static async renderResetRequest(ctx) {
         // console.info(ctx);
         const context = {
-            $flash: ctx.state.session.get('flash'),
+            $flash: ctx.state.session.get('register'),
         };
         ctx.response.body = await ctx.state.handlebars.renderView('password-reset-request', context);
     }

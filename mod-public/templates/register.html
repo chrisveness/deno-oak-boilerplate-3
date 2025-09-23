@@ -4,39 +4,52 @@
     <title>Register</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/nav.css">
     <style>
-        span.username-inuse { color: #990000; font-weight: bold; }
+        p.signed-in { font-size: 80%; color: #990000; }
+        div.username-inuse { color: #990000; font-weight: bold; margin: 0 0 0 6rem; }
     </style>
     <script type="module" src="/js/form.js"></script>
     <script type="module" src="/js/register.js"></script>
 </head>
 <body>
 
+{{>navpartial}}
+
 <main>
+    <div>
 
-    <h1>Register</h1>
+        <h1>Register</h1>
 
-    <form id="register" method="post">
-        <fieldset>
-            <legend>Details</legend>
+        {{>errpartial}}
+
+        {{#if $auth}}
+        <p class="signed-in">Currently signed in as {{$auth.user.username}}</p>
+        {{/if}}
+
+        <form id="register" method="post">
             <ul>
                 <li>
                     <label for="firstname">First name</label>
-                    <input type="text" id="firstname" name="firstname" value="{{$flash.form.firstname}}" autofocus required class="w12">
+                    <input type="text" id="firstname" name="firstname" value="{{$flash.form.firstname}}" autofocus required class="w16">
                 </li>
                 <li>
                     <label for="lastname">Last name</label>
-                    <input type="text" id="lastname" name="lastname" value="{{$flash.form.lastname}}" required class="w12">
+                    <input type="text" id="lastname" name="lastname" value="{{$flash.form.lastname}}" required class="w16">
                 </li>
                 <li>
                     <label for="username">E-mail</label>
-                    <input type="email" id="username" name="username" value="{{$flash.form.username}}" required class="w16"> <span class="username-inuse"></span>
+                    <input type="email" id="username" name="username" value="{{$flash.form.username}}" required class="w16"> <div class="username-inuse"></div>
+                </li>
+                <li>
+                    <label></label>
+                    <button type="submit" class="w16">Register</button>
                 </li>
             </ul>
-        </fieldset>
-        <button type="submit">Register</button>
-    </form>
+        </form>
+
+    </div>
 
 </main>
 

@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Auth handlers - Sign-in/out, profile managment.   © 2023-2024 Chris Veness / Movable Type Ltd  */
+/* Auth handlers - Sign-in/out, profile managment.                © 2023-2025 Chris Veness / MTL  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import Scrypt     from 'scrypt-kdf';
@@ -22,17 +22,14 @@ class AuthHandlers {
      * If user is already signed in, redirect is applied.
      */
     static async renderSignIn(ctx) {
-        if (ctx.state.auth?.user.username) { // already signed-in: redirect to home page or redirect page if supplied
-            const href = ctx.request.url.pathname=='/sign-in'  ? '/' : ctx.request.url.pathname.replace('/sign-in', '');
-            return ctx.response.redirect(href);
+        // if already signed in and redirect supplied, simply redirect there
+        if (ctx.state.auth && ctx.request.url.pathname != '/sign-in') {
+            return ctx.response.redirect(ctx.request.url.pathname.replace('/sign-in', ''));
         }
 
-        // otherwise, render sign-in page
         const context = {
-            $flash: {
-                form:    ctx.state.session.get('form'),
-                failmsg: ctx.state.session.get('failmsg'),
-            },
+            $flash: ctx.state.session.get('fail'), // for 'not recognised' flash message
+            $auth:  ctx.state.auth,                // for 'already signed-in' message
         };
         ctx.response.body = await ctx.state.handlebars.renderView('sign-in', context);
     }
@@ -67,8 +64,8 @@ class AuthHandlers {
 
         if (!user || !passwordMatch) {
             // sign-in failed: redisplay sign-in page with sign-in fail message
-            ctx.state.session.flash('form', form);
-            ctx.state.session.flash('failmsg', 'Username / password not recognised');
+            debug(ctx.state.reqId, 'sign-in ✗', form.username);
+            ctx.state.session.flash('fail', { form, msg: 'Username / password not recognised' });
             return ctx.response.redirect(ctx.request.url.pathname); // redirect to current path, with flash data to refill fields
         }
 

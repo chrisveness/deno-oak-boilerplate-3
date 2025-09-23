@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/css/auth.css">
     <link rel="stylesheet" href="/css/nav.css">
-    <style> ul.logins { font-size: 0.75em; } p.logins { font-size: 0.9em; } </style>
+    <style>
+        p.signed-in { font-size: 80%; color: #990000; }
+        ul.logins { font-size: 0.75em; } p.logins { font-size: 0.9em; }
+    </style>
     <script type="module" src="/js/show-pw.js"></script>
 </head>
 <body>
@@ -18,23 +21,27 @@
 
         <h1>Sign In</h1>
 
-        {{>errpartial}}
+        {{#if $auth}}
+        <p class="signed-in">Currently signed in as {{$auth.user.username}}</p>
+        {{/if}}
 
         <form method="post">
             <ul>
+                {{#if $flash}}
+                <li class="error-msg">{{$flash.msg}}</li>
+                {{/if}}
                 <li>
                     <label for="username">E-mail</label>
-                    <input name="username" id="username" type="email" value="{{$flash.form.username}}" required autofocus class="w12">
+                    <input name="username" id="username" type="email" value="{{$flash.form.username}}" required autofocus class="w16">
                 </li>
                 <li>
                     <label for="password">Password</label>
-                    <input name="password" id="password" type="password" required class="w12">
+                    <input name="password" id="password" type="password" required class="w16">
                     <span id="show-pw" title="show password" class="fa fa-eye"></span>
                 </li>
                 <li>
                     <label></label>
-                    <button type="submit" class="w12">Sign In</button>
-                    {{#if $flash.failmsg}}<span class="error-msg">{{$flash.failmsg}}</span>{{/if}}
+                    <button type="submit" class="w16">Sign In</button>
                 </li>
                 <li class="link">
                     <label></label>

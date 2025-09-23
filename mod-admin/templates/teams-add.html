@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Add member</title>
+    <title>Add team</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/admin/css/admin.css">
@@ -12,24 +12,16 @@
 
 <main>
 
-    <h1>Add member</h1>
+    <h1>Add team</h1>
 
     {{>errpartial}}
 
     <form method="post">
-        <fieldset><legend>Member</legend>
+        <fieldset><legend>Team</legend>
             <ul>
                 <li>
-                    <label for="Firstname">First name</label>
-                    <input name="Firstname" id="Firstname" value="{{Firstname}}" class="w16" autofocus>
-                </li>
-                <li>
-                    <label for="Lastname">Last name</label>
-                    <input name="Lastname" id="Lastname" value="{{Lastname}}" class="w16">
-                </li>
-                <li>
-                    <label for="Email">E-mail</label>
-                    <input name="Email" id="Email" type="email" value="{{Email}}" class="w16" required>
+                    <label for="name">Name</label>
+                    <input name="name" id="name" value="{{$flash.form.name}}" class="w16" required autofocus>
                 </li>
                 <li>
                     <label></label>

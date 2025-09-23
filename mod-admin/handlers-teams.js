@@ -64,8 +64,7 @@ class TeamsHandlers {
      */
     static async renderAddTeam(ctx) {
         const context = {
-            ...ctx.state.session.get('flash').form,
-            $error: ctx.state.session.get('flash').message,
+            $flash: ctx.state.session.get('error'),
             $auth:  ctx.state.auth, // for nav menu
         };
         ctx.response.body = await ctx.state.handlebars.renderView('teams-add', context);
@@ -88,7 +87,7 @@ class TeamsHandlers {
             ctx.response.redirect('/admin/teams'); // return to list of teams
         } catch (err) {
             // stay on same page to report error (with current filled fields)
-            ctx.state.session.flash('flash', { form, error: err.message });
+            ctx.state.session.flash('error', { form, errmsg: err.message });
             ctx.response.redirect(ctx.request.url.pathname);
         }
     }
@@ -124,7 +123,7 @@ class TeamsHandlers {
             ...team,
             teamMembers:    teamMembers,
             notTeamMembers: notTeamMembers,
-            $flash:         ctx.state.session.get('flash'),
+            $flash:         ctx.state.session.get('error'),
             $hideIf:        { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
             $disableIf:     { guest: ctx.state.auth.user.role == 'guest' ? 'disable' : '' },
             $auth:          ctx.state.auth, // for nav menu
@@ -152,7 +151,7 @@ class TeamsHandlers {
             ctx.response.redirect('/admin/teams'); // return to list of teams
         } catch (err) {
             // stay on same page to report error (with current filled fields)
-            ctx.state.session.flash('flash', { form, error: err.message });
+            ctx.state.session.flash('error', { form, errmsg: err.message });
             ctx.response.redirect(ctx.request.url.pathname);
         }
     }

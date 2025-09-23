@@ -1,5 +1,5 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Admin/Register handlers                                      (c) 2019-2024 Chris Veness / MTL  */
+/* Admin/Register handlers                                        © 2019-2025 Chris Veness / MTL  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import { Database }   from '@db/sqlite';
@@ -17,7 +17,8 @@ class HandlersRegister {
      */
     static async renderRegister(ctx) {
         const context = {
-            $flash: ctx.state.session.get('flash'),
+            $flash: ctx.state.session.get('error'),
+            $auth:  ctx.state.auth, // for 'currently signed-in' message
         };
         ctx.response.body = await ctx.state.handlebars.renderView('register', context);
     }
@@ -42,11 +43,11 @@ class HandlersRegister {
             };
             await Mail.sendMarkdownTemplate({ to: form.email }, 'Deno Oak Boilerplate Registration', template, context);
         } catch (err) {
-            ctx.state.session.flash('flash', { form, error: err.message });
+            ctx.state.session.flash('error', { form, errmsg: err.message });
             return ctx.response.redirect(ctx.request.url);
         }
 
-        ctx.state.session.flash('flash', { form, registration: 'registered' });
+        ctx.state.session.flash('register', { form });
         ctx.response.redirect('/password/reset-request');
     }
 
