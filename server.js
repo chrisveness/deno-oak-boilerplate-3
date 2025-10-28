@@ -5,17 +5,17 @@
 /* a larger app broken into modules.                                                              */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import { Application } from '@oak/oak';
-import { Session }     from 'oak_sessions';
-import { Handlebars }  from '@danet/handlebars';
-import Debug           from 'debug'; const debug = Debug('req');
+import * as Oak       from '@oak/oak';
+import { Session }    from 'oak_sessions';
+import { Handlebars } from '@danet/handlebars';
+import Debug          from 'debug'; const debug = Debug('req');
 
 import JwtAuth from './lib/jwt-auth.js';
 
 import './init-db.js'; // load initial test data
 
 
-const app = new Application({ Session });
+const app = new Oak.Application({ Session });
 
 
 // use oak sessions for flash messages
@@ -81,10 +81,11 @@ app.keys = [ 'deno-oak-boilerplate' ];
 app.use(async function responseTime(ctx, next) {
     const moduleStaticFile = [ 'css', 'img', 'js' ].includes(ctx.request.url.pathname.split('/')[2]);
     if (!moduleStaticFile) {
-        // map text/html... => 'html', application/json => 'json', */* => '*', undefined => '-'
-        const acceptMedia = ctx.request.accepts()[0].startsWith('image') ? 'image' : ctx.request.accepts()[0].split(/[/,]/g)[1].padEnd(5) || '-    ';
+        const preferredAccept = ctx.request.accepts()[0]?.split('/'); // e.g. [ 'text', 'html' ]
+        // map text/html... => 'html', application/json => 'json', image/... => image, */* => '*', undefined => '-'
+        ctx.state.accept = [ 'text', 'application' ].includes(preferredAccept[0]) ? preferredAccept[1] : preferredAccept[0] || '-';
         const url = truncate(`${ctx.request.url.pathname}${ctx.request.url.search}`, 64);
-        debug(ctx.state.module.padEnd(6), ctx.state.reqId, ctx.request.method.padEnd(6), acceptMedia, url);
+        debug(ctx.state.module.padEnd(6), ctx.state.reqId, ctx.request.method.padEnd(6), ctx.state.accept.padEnd(5), url);
     }
 
     const now = performance.now();
@@ -126,8 +127,7 @@ app.use(async function handleErrors(ctx, next) {
         // error response, the 'accept' header should be set to 'application/json' (note a browser
         // request will include not just 'text/html' but also '*/*', so check preferred, not just
         // 'application/json')
-        const preferredMimeType = ctx.request.accepts('text/html', 'application/json');
-        if (preferredMimeType == 'application/json') { // return a json object reporting the error
+        if (ctx.state.accept == 'json') { // return a json object reporting the error
             ctx.response.body = { name: err.name, message: err.message };
         } else { // regular html page being served; render error page (or redirect to sign-in for 401)
             switch (err.status) {

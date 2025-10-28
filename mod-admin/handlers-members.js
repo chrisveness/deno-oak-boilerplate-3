@@ -36,7 +36,7 @@ class MembersHandlers {
             $hideIf: { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
             $auth:   ctx.state.auth, // for nav menu
         };
-        if (ctx.request.accepts('text/html', 'application/json') == 'application/json') return ctx.response.body = context; // for tests
+        if (ctx.state.accept == 'json') return ctx.response.body = context; // for tests
         ctx.response.body = await ctx.state.handlebars.renderView('members-list', context);
     }
 
@@ -114,7 +114,7 @@ class MembersHandlers {
             $disableIf:       { guest: ctx.state.auth.user.role == 'guest' ? 'disable' : '' },
             $auth:            ctx.state.auth, // for nav menu
         };
-        if (ctx.request.accepts('text/html', 'application/json') == 'application/json') return ctx.response.body = context; // for tests
+        if (ctx.state.accept == 'json') return ctx.response.body = context; // for tests
         ctx.response.body = await ctx.state.handlebars.renderView('members-edit', context);
     }
 
