@@ -6,6 +6,7 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 import SQLite from 'node:sqlite';
+import Scrypt from 'scrypt-kdf';
 
 const db = new SQLite.DatabaseSync('app.db');
 
@@ -85,8 +86,12 @@ const sqlInsertTeamMember = `
         (100007,100004,100003,'2013-03-17')`;
 db.exec(sqlInsertTeamMember);
 
+const pw = {
+    pwHashGuest: (await Scrypt.kdf('guest', { logN: 12 })).toBase64(),
+    pwHashAdmin: (await Scrypt.kdf('admin', { logN: 12 })).toBase64(),
+};
 const sqlInsertUser = `
     INSERT INTO User VALUES
-        (100001,'Guest','User','guest@user.com','c2NyeXB0AA8AAAAIAAAAAadRWAxJ7PVQ8T6zW7orsuCiHr38TPYJ9TGVbHEK5hvdbC7lCKxKdebdo0T0wR9Aiye4GQDHbLkcBNVVQZpBDtWGfezCWZvtcw4JZ90HDuhb',null,'guest'),
-        (100002,'Admin','User','admin@user.com','c2NyeXB0AA4AAAAIAAAAAfvrpUA5jkh3ObPPUPNQEjbkHXk4vj4xPWH6N8yLEvbgkKqW5zqv3AgsHtTcSL2lzfviyMkXjybHPXeqDY62ZxHEvmTgEY6THddbqOUAOzTQ',null,'admin')`;
-db.exec(sqlInsertUser);
+        (100001,'Guest','User','guest@user.com',:pwHashGuest,null,'guest'),
+        (100002,'Admin','User','admin@user.com',:pwHashAdmin,null,'admin')`;
+db.prepare(sqlInsertUser).run(pw);
