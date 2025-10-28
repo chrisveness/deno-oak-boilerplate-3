@@ -16,45 +16,29 @@ class TeamsHandlers {
      * Results can be filtered with URL query strings eg /teams?name=alpha.
      */
     static async renderTeamsList(ctx) {
-        const qry = ctx.request.url.searchParams;
+        const qry = Object.fromEntries(ctx.request.url.searchParams);
+        const tblFlds = db.prepare('pragma table_info(Team)').all().map(fld => fld.name.toLowerCase());
+        const qryFldsOk = Object.keys(qry).every(el => tblFlds.includes(el.toLowerCase()));
 
-        try {
-            // build sql query including any query-string filters; eg ?field1=val1&field2=val2 becomes
-            // "Where field1 = :field1 And field2 = :field2"
-            const filter = [ ...qry.keys() ].map(fld => `${fld} = :${fld}`).join(' and ');
-            const sql = `
-                Select TeamId, Name
-                From Team
-                Where ${filter || 'true'}
-                Order By Name`;
-            const teams = db.prepare(sql).all(Object.fromEntries(qry.entries()));
 
-            const context = {
-                teams:   teams,
-                $hideIf: { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
-                $auth:   ctx.state.auth, // for nav menu
-            };
-            if (ctx.request.accepts('text/html', 'application/json') == 'application/json') return ctx.response.body = context; // for tests
-            ctx.response.body = await ctx.state.handlebars.renderView('teams-list', context);
-        } catch (err) {
-            if (err.message.startsWith('no such column')) { // display unfiltered list, with error message
-                const sql = `
-                    Select TeamId, Name
-                    From Team
-                    Order By Namee`;
-                const teams = db.prepare(sql).all();
+        // build sql query including any query-string filters; eg ?field1=val1&field2=val2 becomes
+        // "Where field1 = :field1 And field2 = :field2"
+        const filter = qryFldsOk ? Object.keys(qry).map(fld => `${fld} = :${fld}`).join(' and ') : '';
+        const sql = `
+            Select TeamId, Name
+            From Team
+            Where ${filter || 'true'}
+            Order By Name`;
+        const teams = db.prepare(sql).all(qryFldsOk ? qry : {});
 
-                const context = {
-                    teams:   teams,
-                    $error:  err.message,
-                    $hideIf: { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
-                    $auth:   ctx.state.auth, // for nav menu
-                };
-                ctx.response.body = await ctx.state.handlebars.renderView('teams-list', context);
-            } else {
-                throw err;
-            }
-        }
+        const context = {
+            teams:   teams,
+            $error:  qryFldsOk ? '' : `Unrecognised field in ${Object.keys(qry)}`,
+            $hideIf: { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
+            $auth:   ctx.state.auth, // for nav menu
+        };
+        if (ctx.request.accepts('text/html', 'application/json') == 'application/json') return ctx.response.body = context; // for tests
+        ctx.response.body = await ctx.state.handlebars.renderView('teams-list', context);
     }
 
 

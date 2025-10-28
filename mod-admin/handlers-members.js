@@ -16,45 +16,28 @@ class MembersHandlers {
      * Results can be filtered with URL query strings eg /members?firstname=alice.
      */
     static async renderMembersList(ctx) {
-        const qry = ctx.request.url.searchParams;
+        const qry = Object.fromEntries(ctx.request.url.searchParams);
+        const tblFlds = db.prepare('pragma table_info(Member)').all().map(fld => fld.name.toLowerCase());
+        const qryFldsOk = Object.keys(qry).every(el => tblFlds.includes(el.toLowerCase()));
 
-        try {
-            // build sql query including any query-string filters; eg ?field1=val1&field2=val2 becomes
-            // "Where field1 = :field1 And field2 = :field2"
-            const filter = [ ...qry.keys() ].map(fld => `${fld} = :${fld}`).join(' and ');
-            const sql = `
-                Select MemberId, Firstname, Lastname
-                From Member
-                Where ${filter || 'true'}
-                Order By Firstname, Lastname`;
-            const members = db.prepare(sql).all(Object.fromEntries(qry.entries()));
+        // build sql query including any query-string filters; eg ?field1=val1&field2=val2 becomes
+        // "Where field1 = :field1 And field2 = :field2"
+        const filter = qryFldsOk ? Object.keys(qry).map(fld => `${fld} = :${fld}`).join(' and ') : '';
+        const sql = `
+            Select MemberId, Firstname, Lastname
+            From Member
+            Where ${filter || 'true'}
+            Order By Firstname, Lastname`;
+        const members = db.prepare(sql).all(qryFldsOk ? qry : {});
 
-            const context = {
-                members: members,
-                $hideIf: { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
-                $auth:   ctx.state.auth, // for nav menu
-            };
-            if (ctx.request.accepts('text/html', 'application/json') == 'application/json') return ctx.response.body = context; // for tests
-            ctx.response.body = await ctx.state.handlebars.renderView('members-list', context);
-        } catch (err) {
-            if (err.message.startsWith('no such column')) { // display unfiltered list, with error message
-                const sql = `
-                    Select MemberId, Firstname, Lastname
-                    From Member
-                    Order By Firstname, Lastname`;
-                const members = db.prepare(sql).all();
-
-                const context = {
-                    members: members,
-                    $error:  err.message,
-                    $hideIf: { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
-                    $auth:   ctx.state.auth, // for nav menu
-                };
-                ctx.response.body = await ctx.state.handlebars.renderView('members-list', context);
-            } else {
-                throw err;
-            }
-        }
+        const context = {
+            members: members,
+            $error:  qryFldsOk ? '' : `Unrecognised field in ${Object.keys(qry)}`,
+            $hideIf: { guest: ctx.state.auth.user.role == 'guest' ? 'hide' : '' },
+            $auth:   ctx.state.auth, // for nav menu
+        };
+        if (ctx.request.accepts('text/html', 'application/json') == 'application/json') return ctx.response.body = context; // for tests
+        ctx.response.body = await ctx.state.handlebars.renderView('members-list', context);
     }
 
 
