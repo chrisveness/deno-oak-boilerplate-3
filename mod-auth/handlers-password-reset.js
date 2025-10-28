@@ -129,12 +129,12 @@ class PasswordResetHandlers {
         }
 
         // set the password and clear the password reset token
-        const hash = (await Scrypt.kdf(form.password, { logN: 15 })).toString('base64');
+        const hash = await Scrypt.kdf(form.password, { logN: 15 });
         const sql = `
             Update User
             Set Password = :hash, PasswordResetToken = null
             Where UserId = :id`;
-        db.prepare(sql).run({ id: user.UserId, hash: hash });
+        db.prepare(sql).run({ id: user.UserId, hash: hash.toBase64() });
 
         debug('reset', user.username, ctx.params.token);
 

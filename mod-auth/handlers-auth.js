@@ -2,10 +2,9 @@
 /* Auth handlers - Sign-in/out, profile managment.                © 2023-2025 Chris Veness / MTL  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import Scrypt     from 'scrypt-kdf';
-import { Buffer } from 'node:buffer';
-import SQLite     from 'node:sqlite';
-import Debug      from 'debug'; const debug = Debug('auth');
+import Scrypt from 'scrypt-kdf';
+import SQLite from 'node:sqlite';
+import Debug  from 'debug'; const debug = Debug('auth');
 
 import JwtAuth from '../lib/jwt-auth.js';
 
@@ -56,7 +55,7 @@ class AuthHandlers {
         const passwordHash = user ? user.Password : '0123456789abcdef'.repeat(8);
         let passwordMatch = null;
         try {
-            passwordMatch = await Scrypt.verify(Buffer.from(passwordHash, 'base64'), form.password);
+            passwordMatch = await Scrypt.verify(passwordHash, form.password);
         } catch (err) {
             if (err instanceof RangeError) passwordMatch = false; // "Invalid key"
             if (!(err instanceof RangeError)) ctx.throw(401, err);
