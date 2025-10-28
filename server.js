@@ -31,17 +31,17 @@ app.use(async function setEnv(ctx, next) {
 
 // set module = public / auth / admin / api - 'public' module is for anything not within a defined module
 app.use(async function setModule(ctx, next) {
-    // module is drived from 1st segment of path; /auth => auth, /admin => admin, otherwise public
+    // module is drived from 1st segment of path
     const seg1 = ctx.request.url.pathname.split('/')[1];
 
     switch (seg1) {
+        case 'register': ctx.state.module = 'auth'; break;
         case 'sign-in':  ctx.state.module = 'auth'; break;
         case 'password': ctx.state.module = 'auth'; break;
         case 'profile':  ctx.state.module = 'auth'; break;
         case 'admin':    ctx.state.module = 'admin'; break;
         default:         ctx.state.module = 'public'; break;
     }
-
     // module could also be derived from subdomain: ctx.request.url.host.split('.')[0]
 
     await next();
@@ -174,7 +174,7 @@ app.use(async function preflight(ctx, next) {
 
 
 import routesPublic   from './mod-public/routes-public.js';
-import routesRegister from './mod-public/routes-register.js';
+import routesRegister from './mod-auth/routes-register.js';
 import routesAuth     from './mod-auth/routes-auth.js';
 import routesPassword from './mod-auth/routes-password.js';
 import routesAdmin    from './mod-admin/routes-admin.js';
@@ -239,7 +239,7 @@ app.addEventListener('listen', function() {
     const addr = Deno.networkInterfaces().filter(i => i.family == 'IPv4').map(i => i.address).join('/');
     console.info(`Deno/Oak Boilerplate-3 server listening on ${addr}:8080 @ ${new Date().toISOString().slice(0, 16).replace('T', ' ')}Z`);
 });
-app.listen({ port: 8080 });
+await app.listen({ port: 8080 });
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
