@@ -2,7 +2,7 @@
 
 This is a basic sample web application, but with sufficient principal elements of a complete application to enable it to serve as a boilerplate / starting-point for full applications, including:
 - a public module, and a password-secured admin module
-- SQL-based storage
+- SQL-based storage (using SQLite)
 - basic interactive ([CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete)) tools for viewing, adding, editing, and deleting
 - [JWT](https://jwt.io/)-based authentication/login
 
@@ -19,7 +19,7 @@ It builds on the simpler [Deno/Oak ‘hello-world’](https://github.com/chrisve
 It reflects my own (highly opinionated!) preferences for structuring a Deno application:
 - uses native JavaScript, not TypeScript (not everyone’s a fan!).
 - Handlebars is used for Server-Side Rendering (SSR), hydrated with plain JavaScript (generally using `fetch()`).
-- this sample app uses SQLite for self-contained simplicity; for production I use [npm:mysql2](https://www.npmjs.com/package/mysql2) (sometimes MongoDB).
+- this sample app uses SQLite for self-contained simplicity; in production I have used both SQLite and [npm:mysql2](https://www.npmjs.com/package/mysql2) (sometimes MongoDB).
 - Deno comes with test runner built in, and assertions from the `@std` library.
 
 It's pretty bare-bones. There’s no pretty styling! There’s no great UI. Just the bare building-blocks.
@@ -34,7 +34,7 @@ There are some limited access rights: admins can edit details, guests can only v
 
 I use lazy logging: simply [npm:debug](https://www.npmjs.com/package/debug), with [PM2](https://pm2.keymetrics.io) taking care of logs (in production).
 
-In production, I would expect to use PM2 for `deno task start`. The `allow-ffi` argument is for SQLite.
+In production, I would expect to use PM2 for `deno task start`.
 
 This is updated from my [Koa Sample App](https://github.com/chrisveness/koa-sample-web-app-api-mysql), which was from my first exploration into using Node.js; it benefits from the experience of development of a range of applications using Node.js, but I now appreciate Deno being able to leverage the rich modern [JavaScript Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 

@@ -2,11 +2,10 @@
 /* Admin/Teams handlers                                           © 2016-2025 Chris Veness / MTL  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import Debug from 'debug';
-const debug = Debug('app');
+import SQLite from 'node:sqlite';
+import Debug  from 'debug'; const debug = Debug('app');
 
-import { Database } from '@db/sqlite';
-const db = new Database('deno-oak-boilerplate.db');
+const db = new SQLite.DatabaseSync('app.db');
 
 
 class TeamsHandlers {
@@ -28,7 +27,7 @@ class TeamsHandlers {
                 From Team
                 Where ${filter || 'true'}
                 Order By Name`;
-            const teams = await db.prepare(sql).all(Object.fromEntries(qry.entries()));
+            const teams = db.prepare(sql).all(Object.fromEntries(qry.entries()));
 
             const context = {
                 teams:   teams,
@@ -43,7 +42,7 @@ class TeamsHandlers {
                     Select TeamId, Name
                     From Team
                     Order By Namee`;
-                const teams = await db.prepare(sql).all();
+                const teams = db.prepare(sql).all();
 
                 const context = {
                     teams:   teams,
@@ -74,16 +73,17 @@ class TeamsHandlers {
      * POST /admin/teams/add - process add team.
      */
     static async processTeamsAdd(ctx) {
-        debug(`POST   ${ctx.state.reqId} /admin/teams/add`);
         if (ctx.state.auth.user.role != 'admin') ctx.throw(403, 'User management requires admin privileges');
 
         const form = Object.fromEntries(await ctx.request.body.form());
 
+        debug(`POST   ${ctx.state.reqId} /admin/teams/add`, form.name);
+
         try {
             const sql = 'Insert Into Team (Name) Values (:name)';
-            await db.prepare(sql).run(form);
+            const info = db.prepare(sql).run(form);
 
-            ctx.response.headers.set('X-Insert-Id', db.lastInsertRowId); // for tests
+            ctx.response.headers.set('X-Insert-Id', info.lastInsertRowid); // for tests
             ctx.response.redirect('/admin/teams'); // return to list of teams
         } catch (err) {
             // stay on same page to report error (with current filled fields)
@@ -99,7 +99,7 @@ class TeamsHandlers {
     static async renderEditTeam(ctx) {
         // team details
         const sql = 'Select TeamId, Name From Team Where TeamId = :id';
-        const team = await db.prepare(sql).get({ id: ctx.params.id });
+        const team = db.prepare(sql).get({ id: ctx.params.id });
         if (!team) ctx.throw(404, 'Team not found');
 
         // team membership
@@ -108,14 +108,14 @@ class TeamsHandlers {
             From Member Inner Join TeamMember Using (MemberId)
             Where TeamId = :id
             Order By Firstname, Lastname`;
-        const teamMembers = await db.prepare(sqlMembership).all({ id: ctx.params.id });
+        const teamMembers = db.prepare(sqlMembership).all({ id: ctx.params.id });
 
         // all members for add picklist)
         const sqlMembers = `
             Select MemberId, Firstname, Lastname
             From Member
             Order By Firstname, Lastname`;
-        const members = await db.prepare(sqlMembers).all();
+        const members = db.prepare(sqlMembers).all();
 
         const notTeamMembers = members.filter(m => !teamMembers.map(m => m.MemberId).includes(m.MemberId)); // eslint-disable-line no-shadow
 
@@ -146,7 +146,7 @@ class TeamsHandlers {
         // update team details
         try {
             const sql = 'Update Team Set Name = :name Where TeamId = :teamId';
-            await db.prepare(sql).run({ ...form, teamId });
+            db.prepare(sql).run({ ...form, teamId });
 
             ctx.response.redirect('/admin/teams'); // return to list of teams
         } catch (err) {
@@ -160,15 +160,15 @@ class TeamsHandlers {
     /**
      * DELETE /admin/teams/:id - process delete team (JS).
      */
-    static async deleteTeam(ctx) {
+    static deleteTeam(ctx) {
         debug(`DELETE ${ctx.state.reqId} /admin/teams/${ctx.params.id}`);
         if (ctx.state.auth.user.role != 'admin') ctx.throw(403, 'User management requires admin privileges');
 
         const teamId = ctx.params.id;
 
         try {
-            await db.prepare('Delete From TeamMember Where TeamId = :teamId').run({ teamId });
-            await db.prepare('Delete From Team Where TeamId = :teamId').run({ teamId });
+            db.prepare('Delete From TeamMember Where TeamId = :teamId').run({ teamId });
+            db.prepare('Delete From Team Where TeamId = :teamId').run({ teamId });
         } catch (err) {
             ctx.throw(403, err.message);
         }
@@ -187,7 +187,7 @@ class TeamsHandlers {
 
         try {
             const sql = 'Insert Into TeamMember(TeamId, MemberId, JoinedOn) Values (:teamId, :memberId, :joinedOn)';
-            await db.prepare(sql).run({ ...ctx.params, ...body });
+            db.prepare(sql).run({ ...ctx.params, ...body });
         } catch (err) {
             ctx.throw(403, err.message);
         }
@@ -199,13 +199,13 @@ class TeamsHandlers {
     /**
      * DELETE /admin/teams/:teamId/members/:memberId - delete member from team (JS).
      */
-    static async deleteTeamMember(ctx) {
+    static deleteTeamMember(ctx) {
         debug(`DELETE ${ctx.state.reqId} /admin/teams/${ctx.params.teamId}/members/${ctx.params.memberId}`);
         if (ctx.state.auth.user.role != 'admin') ctx.throw(403, 'User management requires admin privileges');
 
         try {
             const sql = 'Delete From TeamMember Where TeamId = :teamId And MemberId = :memberId';
-            await db.prepare(sql).run(ctx.params);
+            db.prepare(sql).run(ctx.params);
         } catch (err) {
             ctx.throw(403, err.message);
         }

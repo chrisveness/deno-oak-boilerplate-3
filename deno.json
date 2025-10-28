@@ -1,13 +1,12 @@
 {
   "tasks": {
-    "start":      "deno run -NRES --allow-ffi -W=$HOME/.cache/deno/plug --env-file server.js",
-    "dev":        "deno run -NRES --allow-ffi -W=$HOME/.cache/deno/plug --env-file --watch server.js",
+    "start":      "deno run -NRES -W=app.db --env-file server.js",
+    "dev":        "deno run -NRES -W=app.db --env-file --watch server.js",
     "test":       "deno test -NE --env-file test/*.js",
     "lint":       "deno run -A npm:eslint",
     "check-deps": "deno run -A jsr:@check/deps"
   },
   "imports": {
-    "@db/sqlite":          "jsr:@db/sqlite@^0",
     "@danet/handlebars":   "jsr:@danet/handlebars@^0",
     "@eslint/js":          "npm:@eslint/js@^9",
     "@oak/oak":            "jsr:@oak/oak@^17",

@@ -1,12 +1,13 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-/* Initialise Deno/Oak boilerplate database                            © 2024 Chris Veness / MTL  */
+/* Initialise Deno/Oak boilerplate database                       © 2024-2025 Chris Veness / MTL  */
 /*                                                                                                */
-/* This SQLite database stands in for a typical production SQL database, for simplicity in the    */
-/* boilerplate/sample application. The database is recreated from scratch on each restart.        */
+/* SQLite may be a viable production database in some cases, in others a client/server DMBS might */
+/* be preferred. In this sample app, the database is recreated from scratch on each restart.      */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import { Database } from '@db/sqlite';
-const db = new Database('deno-oak-boilerplate.db');
+import SQLite from 'node:sqlite';
+
+const db = new SQLite.DatabaseSync('app.db');
 
 db.exec('DROP TABLE IF EXISTS TeamMember');
 db.exec('DROP TABLE IF EXISTS Team');
@@ -21,7 +22,7 @@ const sqlCreateMember = `
         Firstname TEXT COLLATE NOCASE,
         Lastname  TEXT COLLATE NOCASE,
         Email     TEXT NOT NULL UNIQUE COLLATE NOCASE,
-        Active    BIT(1)
+        Active    BOOLEAN
     )`;
 db.exec(sqlCreateMember);
 

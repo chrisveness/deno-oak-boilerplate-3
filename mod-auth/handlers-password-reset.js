@@ -2,12 +2,12 @@
 /* Password Reset handlers                           © 2024-2025 Chris Veness / Movable Type Ltd  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import Scrypt         from 'scrypt-kdf';
-import crypto         from 'node:crypto';
-import { Database }   from '@db/sqlite';
-import Debug          from 'debug';
-const db = new Database('deno-oak-boilerplate.db');
-const debug = Debug('password');
+import Scrypt from 'scrypt-kdf';
+import crypto from 'node:crypto';
+import SQLite from 'node:sqlite';
+import Debug  from 'debug'; const debug = Debug('password');
+
+const db = new SQLite.DatabaseSync('app.db');
 
 import Mail from '../lib/mail.js';
 
@@ -48,7 +48,7 @@ class PasswordResetHandlers {
             Select UserId, Firstname, Email, Password
             From User
             Where Email = :username`;
-        const user = await db.prepare(sqlUser).get({ username: form.username });
+        const user = db.prepare(sqlUser).get({ username: form.username });
 
         // current timestamp for token expiry in base36
         const now = Math.floor(Date.now()/1000).toString(36);
@@ -70,7 +70,7 @@ class PasswordResetHandlers {
             Update User
             Set PasswordResetToken = :token
             Where UserId = :id`;
-        await db.prepare(sqlUpdate).run({ id: user.UserId, token: token });
+        db.prepare(sqlUpdate).run({ id: user.UserId, token: token });
 
         // send e-mail with generated token
         const template = await Deno.readTextFile('./mod-auth/templates/password-reset.email.md');
@@ -103,7 +103,7 @@ class PasswordResetHandlers {
         const token = ctx.params.token;
 
         // check token is good
-        const user = await PasswordResetHandlers.#userForResetToken(token);
+        const user = PasswordResetHandlers.#userForResetToken(token);
         if (!user) {
             ctx.response.body = await ctx.state.handlebars.renderView('password-reset', { badToken: true });
             return;
@@ -122,7 +122,7 @@ class PasswordResetHandlers {
         const form = Object.fromEntries(await ctx.request.body.form());
 
         // check token is good
-        const user = await PasswordResetHandlers.#userForResetToken(token);
+        const user = PasswordResetHandlers.#userForResetToken(token);
         if (!user) {
             ctx.response.body = await ctx.state.handlebars.renderView('password-reset', { badToken: true });
             return;
@@ -134,7 +134,7 @@ class PasswordResetHandlers {
             Update User
             Set Password = :hash, PasswordResetToken = null
             Where UserId = :id`;
-        await db.prepare(sql).run({ id: user.UserId, hash: hash });
+        db.prepare(sql).run({ id: user.UserId, hash: hash });
 
         debug('reset', user.username, ctx.params.token);
 
@@ -155,12 +155,12 @@ class PasswordResetHandlers {
      * @param   {string} token - The reset token to be checked.
      * @returns {object} User if token is valid, otherwise null.
      */
-    static async #userForResetToken(token) {
+    static #userForResetToken(token) {
         const sql = `
             Select UserId, Email, Password
             From User
             Where PasswordResetToken = :token`;
-        const user = await db.prepare(sql).get({ token: token });
+        const user = db.prepare(sql).get({ token: token });
 
         if (!user) return null; // token not found
 
@@ -169,7 +169,7 @@ class PasswordResetHandlers {
 
         // check token is not expired
         if (Date.now()/1000 - parseInt(timestamp, 36) > 60*60*24) {
-            await db.prepare('Update User Set PasswordResetToken = Null Where PasswordResetToken = :token').run({ token });
+            db.prepare('Update User Set PasswordResetToken = Null Where PasswordResetToken = :token').run({ token });
             return null; // over 24 hours old: clear token & return null
         }
 

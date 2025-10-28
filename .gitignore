@@ -1,2 +1,2 @@
 .env
-deno-oak-boilerplate.db
+app.db

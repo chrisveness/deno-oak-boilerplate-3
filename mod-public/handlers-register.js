@@ -2,10 +2,11 @@
 /* Admin/Register handlers                                        © 2019-2025 Chris Veness / MTL  */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-import { Database }   from '@db/sqlite';
-import Debug          from 'debug';
-const db = new Database('deno-oak-boilerplate.db');
-const debug = Debug('register');
+import SQLite from 'node:sqlite';
+import Debug  from 'debug'; const debug = Debug('register');
+
+const db = new SQLite.DatabaseSync('app.db');
+
 
 import Mail from '../lib/mail.js';
 
@@ -32,8 +33,8 @@ class HandlersRegister {
         debug('POST /register', form.username);
 
         try {
-            const sql = 'Insert Into User (Firstname, Lastname, Email) Values (:firstname, :lastname, :username)';
-            await db.prepare(sql).run(form);
+            const sql = 'Insert Into User (Firstname, Lastname, Email, Role) Values (:firstname, :lastname, :username, \'guest\')';
+            db.prepare(sql).run(form);
 
             // send registration confirmation e-mail
             const template = await Deno.readTextFile('./mod-public/templates/register.email.md');
@@ -57,18 +58,18 @@ class HandlersRegister {
      *
      * Return 200 if username / e-mail belongs to current signed-in user (e.g. editing profile).
      */
-    static async getRegisterAvailable(ctx) {
+    static getRegisterAvailable(ctx) {
         const qry = Object.fromEntries(ctx.request.url.searchParams);
         // username & email are currently synonymous
         if (qry.username) {
             const sql = 'Select UserId From User Where Email = :username And UserId != :id';
-            const user = await db.prepare(sql).get({ username: qry.username, id: ctx.state.auth?.user.userid||0 });
+            const user = db.prepare(sql).get({ username: qry.username, id: ctx.state.auth?.user.userid||0 });
             ctx.response.status = user ? 403 : 200;
             return;
         }
         if (qry.email) {
-            const sql = 'Select id From users Where email = :email And id != :id';
-            const user = await db.prepare(sql).get({ email: qry.email, id: ctx.state.auth?.user.userid||0 });
+            const sql = 'Select UserId From User Where Email = :email And id != :id';
+            const user = db.prepare(sql).get({ email: qry.email, id: ctx.state.auth?.user.userid||0 });
             ctx.response.status = user ? 403 : 200;
             return;
         }

@@ -4,12 +4,12 @@
 
 import Scrypt     from 'scrypt-kdf';
 import { Buffer } from 'node:buffer';
+import SQLite     from 'node:sqlite';
 import Debug      from 'debug'; const debug = Debug('auth');
 
-import { Database } from '@db/sqlite';
-import JwtAuth      from '../lib/jwt-auth.js';
+import JwtAuth from '../lib/jwt-auth.js';
 
-const db = new Database('deno-oak-boilerplate.db');
+const db = new SQLite.DatabaseSync('app.db');
 
 
 class AuthHandlers {
@@ -50,7 +50,7 @@ class AuthHandlers {
             Select UserId, Email, Password, Role
             From User
             Where Email = :email`;
-        const user = await db.prepare(sql).get({ email: form.username });
+        const user = db.prepare(sql).get({ email: form.username });
 
         // always invoke verify() (whether email found or not) to mitigate against timing attacks on sign-in function
         const passwordHash = user ? user.Password : '0123456789abcdef'.repeat(8);
@@ -105,7 +105,7 @@ class AuthHandlers {
             Select UserId, Firstname, Lastname, Email, Role
             From User
             Where Email = :email`;
-        const user = await db.prepare(sql).get({ email: ctx.state.auth.user.username });
+        const user = db.prepare(sql).get({ email: ctx.state.auth.user.username });
 
         const context = {
             ...user,
@@ -126,7 +126,7 @@ class AuthHandlers {
             Update User
             Set Firstname = :firstname, Lastname = :lastname, Email = :username
             Where UserId = :id`;
-        await db.prepare(sql).run(form);
+        db.prepare(sql).run(form);
 
         ctx.response.redirect('/admin');
     }
